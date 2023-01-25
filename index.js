@@ -18,6 +18,41 @@ class Boundary {
     }
 };
 
+class Player {
+    constructor({position, velocity}) {
+        this.position = position;
+        this.velocity = velocity;
+        this.radius = 15;
+    }
+    draw() {
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+        c.fillStyle = 'yellow';
+        c.fill();
+        c.closePath();
+    }
+
+    update() {
+        this.draw();
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+    }
+};
+
+const keys = {
+    ArrowUp: {
+        pressed: false
+    },
+    ArrowLeft: {
+        pressed: false
+    },
+    ArrowDown: {
+        pressed: false
+    },
+    ArrowRight: {
+        pressed: false
+    },
+}
 const map = [
     ['-', '-', '-', '-', '-', '-'], 
     ['-', '_', '_', '_', '_', '-'], 
@@ -26,7 +61,18 @@ const map = [
     ['-', '-', '-', '-', '-', '-']
 ]
 
-const boundaries = []
+const boundaries = [];
+const player = new Player({
+position: {
+    x: Boundary.width + Boundary.width / 2,
+    y: Boundary.height + Boundary.height / 2
+},
+velocity: {
+    x: 0,
+    y: 0
+}
+});
+
 map.forEach((row, index) => {
     row.forEach((symbol, j) => {
         switch(symbol) {
@@ -42,4 +88,66 @@ map.forEach((row, index) => {
     })
 })
 
-boundaries.forEach((boundary) => boundary.draw());
+function animate() {
+    requestAnimationFrame(animate)
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    boundaries.forEach((boundary) => boundary.draw());
+    player.update();
+    player.velocity.x = 0
+     player.velocity.y = 0
+
+    if (keys.ArrowUp.pressed && lastKey === 'ArrowUp') {
+        player.velocity.y = -5
+    } else if(keys.ArrowLeft.pressed && lastKey === 'ArrowLeft') {
+        player.velocity.x = -5
+    } else if(keys.ArrowDown.pressed && lastKey === 'ArrowDown') {
+        player.velocity.y = 5
+    } else if(keys.ArrowRight.pressed && lastKey === 'ArrowRight') {
+        player.velocity.x = 5
+    }
+
+}
+animate();
+
+
+addEventListener('keydown', ({key}) => {
+
+switch (key) {
+    case 'ArrowUp':
+        keys.ArrowUp.pressed = true;
+        lastKey = 'ArrowUp';
+    break
+    case 'ArrowLeft':
+        keys.ArrowLeft.pressed = true;
+        lastKey = 'ArrowLeft';
+    break
+    case 'ArrowDown':
+        keys.ArrowDown.pressed = true;
+        lastKey = 'ArrowDown';
+    break
+    case 'ArrowRight':
+        keys.ArrowRight.pressed = true;
+        lastKey = 'ArrowRight';
+    break
+}
+})
+
+addEventListener('keyup', ({key}) => {
+
+    switch (key) {
+        case 'ArrowUp':
+            keys.ArrowUp.pressed = false
+        break
+        case 'ArrowLeft':
+            keys.ArrowLeft.pressed = false
+        break
+        case 'ArrowDown':
+            keys.ArrowDown.pressed = false
+        break
+        case 'ArrowRight':
+            keys.ArrowRight.pressed = false
+        break
+    }
+    });
+
+    let lasKey = '';
